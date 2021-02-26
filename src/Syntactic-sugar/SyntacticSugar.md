@@ -5,24 +5,26 @@
 
 常见的Java语法糖：
 
-> <font face="Jetbrains Mono">·[for-each](#for-each)</font><br>
-> <font face="Jetbrains Mono">·[enum](#enum)</font><br>
-> <font face="Jetbrains Mono">·[不定项参数](#params)</font><br>
-> <font face="Jetbrains Mono">·[静态导入](#import)</font><br>
-> <font face="Jetbrains Mono">·[自动装箱与拆箱](#box)</font><br>
-> <font face="Jetbrains Mono">·[多异常并列](#execption)</font><br>
-> <font face="Jetbrains Mono">·[数值赋值优化](#assume)</font><br>
-> <font face="Jetbrains Mono">·[接口方法](#interface)</font><br>
+> <font face="Fira Code">·[for-each](#for-each)</font><br>
+> <font face="Fira Code">·[enum](#enum)</font><br>
+> <font face="Fira Code">·[不定项参数](#params)</font><br>
+> <font face="Fira Code">·[静态导入](#import)</font><br>
+> <font face="Fira Code">·[自动装箱与拆箱](#box)</font><br>
+> <font face="Fira Code">·[多异常并列](#execption)</font><br>
+> <font face="Fira Code">·[数值赋值优化](#assume)</font><br>
+> <font face="Fira Code">·[接口方法](#interface)</font><br>
+> <font face="Fira Code">·[try-with-resource](#twr)</font><br>
+> <font face="Fira Code">·[var类型](#var)</font><br>
 
 ---
 
-## <a id="for-each"><font face="Jetbrains Mono">for-each</font></a>
+## <a id="for-each"><font face="Fira Code">for-each</font></a>
 ```java
 // this is an example for 'for-each'
 
 ```
 
-## <a id="enum"><font face="Jetbrains Mono">enum</font></a>
+## <a id="enum"><font face="Fira Code">enum</font></a>
 ```java
 // this is an example for 'enum'
 ```
@@ -83,7 +85,7 @@ class Example() {
 ## <a id="import">静态导入</a>
 `import static - 便于简写`
 
-<font face="Jetbrains Mono" color="#db7093">
+<font face="Fira Code" color="#db7093">
     import导入程序所需要的类<br>
     import static导入一个雷的静态方法or静态变量
 </font>
@@ -211,7 +213,7 @@ class Example() {
 ## <a id="assume">数值赋值优化</a>
 `JDK7 - 整数类型使用二进制数赋值`
 
-目的：避免二进制计算，适用于<font color="red" face="Jetbrains Mono">**byte、short、int、long**</font>
+目的：避免二进制计算，适用于<font color="red" face="Fira Code">**byte、short、int、long**</font>
 
 `使用`
 ```java
@@ -241,9 +243,9 @@ class Example() {
 
 这种方法来赋值，增加了数字的可读性与纠错功能
 
--使用范围：short、int、long、float、double
--下划线只能出现在数字中间，也即前后必须都有数字
--允许在2、8、10、16进制的数字中使用，下划线不可以分割开头
+- 使用范围：short、int、long、float、double
+- 下划线只能出现在数字中间，也即前后必须都有数字
+- 允许在2、8、10、16进制的数字中使用，下划线不可以分割开头
 
 ```java
 // 正确使用：
@@ -265,3 +267,203 @@ class RightExample() {
 
 ## <a id="interface">接口方法</a>
 `JDK8 plus lambda表达式`
+
+> 在最初的java接口中，所有的接口都是没有实现的、公开的<br><br>
+> 在`Java 8`时，推出的接口的默认方法/静态方法都是可带有实现的，而且开始支持Lambda表达式<br><br>\
+> 在`Java 9`时，接口拥有了私有方法
+
+```java
+// JDK1~7
+public interface Animal {
+	public void move();
+}
+
+// JDK8~?
+public interface NewAnmail {
+	public default void move() {
+		System.out.println("I can move");
+    }
+}
+```
+
+`🚩注意`
+
+<span style="font-family: 'JetBrains Mono'">
+    对于接口的默认方法：<br>
+    1. 默认方法以<font color="#db7093">default</font>作为关键字的标注<br>
+    2. 默认方法不允许重写Object中的方法，如equals、toString等<br>
+    3. 具体实现类可以继承、重写父接口的默认方法<br>
+    4. 接口可以继承、重写父接口的默认方法<br>
+    5. 为了向前兼容，如果一个类的父类和父接口都有（同名同参数的）默认方法，子类会继承父类的默认方法<br>
+    6. 如果子类实现了两个接口（均含有同名同参数的默认方法），则会导致编译失败，需要在子类中重写这个default方法
+</span>
+
+`默认方法-示例`
+
+```java
+public interface Animal {
+	public void move();
+}
+
+public interface NewAnimal {
+	public void move() {
+		System.out.println("moving");
+    }
+}
+
+public class Lion implements Animal, NewAnimal {
+	public static void main(String[] args) {
+        new Lion().move();
+	}
+	
+	// 当实现的两个接口都含有同名方法，且至少有一个是默认方法时
+    // 子类需要重写该方法，以免歧义
+    public void move() {
+		// 设置为默认方法的形式
+	    NewAnimal.super.move();
+    }
+}
+```
+
+[![yqjfnf.png](https://s3.ax1x.com/2021/02/23/yqjfnf.png)](https://imgchr.com/i/yqjfnf)
+
+`静态方法-注意`
+
+> 静态方法属于接口，不属于子类或者子接口，也即子类/子接口没法继承该静态方法，只能通过所在的接口名称来调用
+
+`私有方法`
+
+> 为了解决多个默认方法/静态方法的内容重复的问题<br><br>
+> 私有方法只属于本接口，只在本接口内使用，不属于子类/子接口；子类/子接口没有继承该私有方法，也无法调用<br><br>
+> 静态私有方法可以被静态/默认方法调用，非静态私有方法被默认方法调用
+
+## <a id="twr"><font face="Fira Code">try-with-resource</font></a>
+
+`类似python的with语句`
+
+> <font face="Fira code">try-with-resource语句简化了try-catch-finally</font>
+
+<span style="font-family: 'Fira Code'">
+    使用try-with-resource，可以保证在使用完资源后，将资源自动关闭
+</span>
+
+```java
+import java.io.FileInputStream;
+
+class Example() {
+	public static void main(String[] args) {
+		// 使用try-catch-finally
+		FileInputStream fis = "**/**.json";
+		try { 
+			/* pass */ 
+		} catch (Exception e) {
+			/* do sth. */
+		} finally {
+			// 关闭资源
+			if (fis != null) fis.close();
+		}
+		
+		// 使用try-with-resource
+        try(FileInputStream newFis = "**/**/txt") {
+        	/* pass */
+        } catch (Exception e) {
+        	/* do sth. */
+        }
+	}
+}
+```
+
+`🚩注意`
+
+<span style="font-family: 'Fira Code'">
+    <font color="#db7093">JDK7</font> 如果使用try-with-resource，则必须保证资源定义在try中。如果已经在外面定义，则需要一个本地变量。
+</span>
+
+```java
+class Example() {
+	public static void main(String[] args) {
+		FileInputStream fis = "**/**.json";
+		
+		try(FileInputStream fis_2 = fis) {}
+		catch (Exception e) {}
+	}
+}
+```
+
+<span style="font-family: 'Fira Code'">
+    <font color="#db7093">JDK9</font> 不再要求定义临时变量，可以直接使用外部资源变量。
+</span>
+
+```java
+class Example() {
+	public static void main(String[] args) {
+		FileInputStream fis = "**/**.json";
+		
+		try(fis) {}
+		catch (Exception e) {}
+	}
+}
+```
+
+`🌊原理`
+> <font face="Fira Code">
+>   如果需要使用try-with-resource语句，则需要保证资源对象实现类AutoCloseable接口，也即实现close方法<br><br>
+> <code style="color: palevioletred">public class FileInputStream extends InputStream</code><br>
+> <code style="color: palevioletred">public abstract class InputStream implements Closeable</code>
+> </font>
+
+`使用`
+
+```java
+class Example {
+	public static void main(String[] args) {
+        try (MyResource m = new MyResource()) {
+        	// do sth.
+        } catch (Exception e) {
+        	// then
+        }
+	}
+}
+
+class MyResource implements AutoCloseable {
+	 public void doSomething() throws Exception {
+		 System.out.println("do sth.");
+     }
+    
+     public void close() throws Exception {
+	     System.out.println("Close...");
+     }
+}
+```
+
+## <a id="var"><font face="Fira Code">var类型</font></a>
+`Java 10`
+
+> <div style="font-family: 'Fira Code'">
+>   在java10之前，java都是一种强类型的程序语言
+> </div>
+```java
+// 强类型指
+class Example {
+	int a = 1;
+	double b = 1.0;
+}
+```
+
+> <div style="font-family: 'Fira Code'">
+>   在java10之后，推出局部变量推断，在一定程度上可以避免信息冗余<br><br>
+>   不过本质上java还是强类型的语言，由编译器负责推断类型写入字节码文件，推断完成后不可更改
+> </div>
+```java
+class Example {
+	public static void main(String[] args) {
+        var a = 5;
+	}
+}
+```
+
+`🚩注意`
+
+<div style="font-family: 'Fira Code'">
+1. var可以用在局部变量上，而非类成员变量
+</div>
