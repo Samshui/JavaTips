@@ -35,7 +35,7 @@
 
 `使用`
 ```java
-class SugarExample() { 
+class SugarExample { 
     // String(type)... sth.
     public static void print(String... args) {
         for (String arg : args) 
@@ -60,7 +60,7 @@ class SugarExample() {
 > > 如果调用时同时与两个带有可变参数的方法匹配，则报错
 
 ```java
-class Example() { 
+class Example { 
     public static void print(String... args) {
         for (String arg : args)
             System.out.println(arg + arg.length());
@@ -95,11 +95,11 @@ class Example() {
 import static java.lang.Math.pow;
 import static java.lang.System.out;
 
-class Example() {
-	public static void main(String[] args) {
+class Example {
+    public static void main(String[] args) {
         int c = pow(1, 2);
         out.println(c);
-	}
+    }
 }
 ```
 
@@ -133,8 +133,8 @@ class Example() {
 
 `示例`
 ```java
-class Boxing() {
-	public static void main(String[] args) {
+class Boxing {
+    public static void main(String[] args) {
         // 不使用装箱
         Integer i1 = Integer.valueOf(5);
         // 自动装箱
@@ -144,7 +144,7 @@ class Boxing() {
         int i3 = i1.intValue();
         // 自动拆箱
         int i4 = i1;
-	}
+    }
 }
 ```
 
@@ -170,27 +170,27 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 // 不使用多异常并列
-class Example() {
-	public static void main(String[] args) {
-		try {
-			// pass
-		} catch (IOException ex) {
-			// do sth.
-		} catch (SQLException ex) {
-			// do the same thing.
-		}
-	}
+class Example {
+    public static void main(String[] args) {
+        try {
+            // pass
+        } catch (IOException ex) {
+            // do sth.
+        } catch (SQLException ex) {
+            // do the same thing.
+        }
+    }
 }
 
 // 使用多异常并列 -> 管道符号的使用
-class Example() {
-	public static void main(String[] args) {
+class Example {
+    public static void main(String[] args) {
         try {
-        	// pass
+            // pass
         } catch (IOException | SQLException ex) {
-        	// do sth.
+            // do sth.
         }
-	}
+    }
 }
 ```
 
@@ -198,7 +198,7 @@ class Example() {
 > 并列在一个catch中的多个异常之间**不能有直接/间接的基础关系**
 > ```java
 > // 错误展示
-> class ErrorExample() {
+> class ErrorExample {
 >   public static void main() {
 >       try {
 >           // pass
@@ -217,15 +217,15 @@ class Example() {
 
 `使用`
 ```java
-class Example() {
-	public static void main(String[] args) {
-		// 0010-0001
-		byte a1 = (byte) 0b00100001;
-		// 1010-0001-0100-0101
+class Example {
+    public static void main(String[] args) {
+        // 0010-0001
+        byte a1 = (byte) 0b00100001;
+        // 1010-0001-0100-0101
         short a2 = (short) 0b1010000101000101;
         // 1010-0001-0100-0101-1010-0001-0100-0101
         int a3 = (int) 0b10100001010001011010000101000101;
-	}
+    }
 }
 ```
 ---
@@ -233,11 +233,11 @@ class Example() {
 
 这个真的超好用！
 ```java
-class Example() {
-	public static void main(String[] args) {
+class Example {
+    public static void main(String[] args) {
         int a1 = 0b0111_1011_0001;
         long a2 = 9_999_999_999L;
-	}
+    }
 }
 ```
 
@@ -249,8 +249,8 @@ class Example() {
 
 ```java
 // 正确使用：
-class RightExample() {
-	public static void main(String[] args) {
+class RightExample {
+    public static void main(String[] args) {
         int i1 = 0b0111_1011_0001;// 二进制，0b开头
         int i2 = 02_014;// 八进制，0开头
         int i3 = 0x7_B_1;// 十六进制，0x开头
@@ -261,7 +261,7 @@ class RightExample() {
         
         float f1 = 3.14_159f;
         double d1 = 1.4_14159;
-	}
+    }
 }
 ```
 
@@ -275,13 +275,13 @@ class RightExample() {
 ```java
 // JDK1~7
 public interface Animal {
-	public void move();
+    public void move();
 }
 
 // JDK8~?
 public interface NewAnmail {
-	public default void move() {
-		System.out.println("I can move");
+    public default void move() {
+        System.out.println("I can move");
     }
 }
 ```
@@ -302,25 +302,25 @@ public interface NewAnmail {
 
 ```java
 public interface Animal {
-	public void move();
+    public void move();
 }
 
 public interface NewAnimal {
-	public void move() {
-		System.out.println("moving");
+    public void move() {
+        System.out.println("moving");
     }
 }
 
 public class Lion implements Animal, NewAnimal {
-	public static void main(String[] args) {
+    public static void main(String[] args) {
         new Lion().move();
-	}
-	
-	// 当实现的两个接口都含有同名方法，且至少有一个是默认方法时
+    }
+    
+    // 当实现的两个接口都含有同名方法，且至少有一个是默认方法时
     // 子类需要重写该方法，以免歧义
     public void move() {
-		// 设置为默认方法的形式
-	    NewAnimal.super.move();
+        // 设置为默认方法的形式
+        NewAnimal.super.move();
     }
 }
 ```
@@ -350,26 +350,26 @@ public class Lion implements Animal, NewAnimal {
 ```java
 import java.io.FileInputStream;
 
-class Example() {
-	public static void main(String[] args) {
-		// 使用try-catch-finally
-		FileInputStream fis = "**/**.json";
-		try { 
-			/* pass */ 
-		} catch (Exception e) {
-			/* do sth. */
-		} finally {
-			// 关闭资源
-			if (fis != null) fis.close();
-		}
-		
-		// 使用try-with-resource
-        try(FileInputStream newFis = "**/**/txt") {
-        	/* pass */
+class Example {
+    public static void main(String[] args) {
+        // 使用try-catch-finally
+        FileInputStream fis = "**/**.json";
+        try { 
+            /* pass */ 
         } catch (Exception e) {
-        	/* do sth. */
+            /* do sth. */
+        } finally {
+            // 关闭资源
+            if (fis != null) fis.close();
         }
-	}
+        
+        // 使用try-with-resource
+        try(FileInputStream newFis = "**/**/txt") {
+            /* pass */
+        } catch (Exception e) {
+            /* do sth. */
+        }
+    }
 }
 ```
 
@@ -380,13 +380,13 @@ class Example() {
 </span>
 
 ```java
-class Example() {
-	public static void main(String[] args) {
-		FileInputStream fis = "**/**.json";
-		
-		try(FileInputStream fis_2 = fis) {}
-		catch (Exception e) {}
-	}
+class Example {
+    public static void main(String[] args) {
+        FileInputStream fis = "**/**.json";
+        
+        try(FileInputStream fis_2 = fis) {}
+        catch (Exception e) {}
+    }
 }
 ```
 
@@ -395,13 +395,13 @@ class Example() {
 </span>
 
 ```java
-class Example() {
-	public static void main(String[] args) {
-		FileInputStream fis = "**/**.json";
-		
-		try(fis) {}
-		catch (Exception e) {}
-	}
+class Example {
+    public static void main(String[] args) {
+        FileInputStream fis = "**/**.json";
+        
+        try(fis) {}
+        catch (Exception e) {}
+    }
 }
 ```
 
@@ -416,22 +416,22 @@ class Example() {
 
 ```java
 class Example {
-	public static void main(String[] args) {
+    public static void main(String[] args) {
         try (MyResource m = new MyResource()) {
-        	// do sth.
+            // do sth.
         } catch (Exception e) {
-        	// then
+            // then
         }
-	}
+    }
 }
 
 class MyResource implements AutoCloseable {
-	 public void doSomething() throws Exception {
-		 System.out.println("do sth.");
+     public void doSomething() throws Exception {
+         System.out.println("do sth.");
      }
     
      public void close() throws Exception {
-	     System.out.println("Close...");
+         System.out.println("Close...");
      }
 }
 ```
@@ -445,8 +445,8 @@ class MyResource implements AutoCloseable {
 ```java
 // 强类型指
 class Example {
-	int a = 1;
-	double b = 1.0;
+    int a = 1;
+    double b = 1.0;
 }
 ```
 
@@ -456,9 +456,9 @@ class Example {
 > </div>
 ```java
 class Example {
-	public static void main(String[] args) {
+    public static void main(String[] args) {
         var a = 5;
-	}
+    }
 }
 ```
 
@@ -493,20 +493,20 @@ class Example {
 `使用`
 
 ```java
-class Example() {
-	public static void main(String[] args) {
+class Example {
+    public static void main(String[] args) {
         Integer s = 10;
         switch (s) {
             case 1:
-	            System.out.println("s = 1");
+                System.out.println("s = 1");
             case 10:
-	            System.out.println("s = 10");
+                System.out.println("s = 10");
             case 100:
-	            System.out.println("s = 100");
+                System.out.println("s = 100");
             default:
-	            System.out.println("s = 0");
+                System.out.println("s = 0");
         }
-	}
+    }
 }
 ```
 
@@ -514,29 +514,29 @@ class Example() {
 `例子`
 
 ```java
-class Example() {
-	public static void main(String[] args) {
+class Example {
+    public static void main(String[] args) {
         int month;
         int day;
         
         // 方式一
         switch (month) {
-        	case 1, 3, 5, 7, 8, 10, 12 -> day = 31;
-        	case 4, 6, 9, 11 -> day = 30;
-        	case 2 -> day = 28;
+            case 1, 3, 5, 7, 8, 10, 12 -> day = 31;
+            case 4, 6, 9, 11 -> day = 30;
+            case 2 -> day = 28;
             default -> day = 0;
         }
         
         // 方式二
         int the_day = switch (month) {
-	        case 1, 3, 5, 7, 8, 10, 12 -> 31;
-	        case 4, 6, 9, 11 -> 30;
-	        default -> {
-	        	// 此处特殊
-	        	int Day = 28;
-	        	break Day;
+            case 1, 3, 5, 7, 8, 10, 12 -> 31;
+            case 4, 6, 9, 11 -> 30;
+            default -> {
+                // 此处特殊
+                int Day = 28;
+                break Day;
             }
         };
-	}
+    }
 }
 ```
