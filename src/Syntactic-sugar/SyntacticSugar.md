@@ -22,7 +22,6 @@
 ## <a id="for-each"><font face="Fira Code">for-each</font></a>
 ```java
 // this is an example for 'for-each'
-
 ```
 
 ## <a id="enum"><font face="Fira Code">enum</font></a>
