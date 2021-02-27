@@ -15,6 +15,7 @@
 > <font face="Fira Code">·[接口方法](#interface)</font><br>
 > <font face="Fira Code">·[try-with-resource](#twr)</font><br>
 > <font face="Fira Code">·[var类型](#var)</font><br>
+> <font face="Fira Code">·[switch](#switch)</font><br> 
 
 ---
 
@@ -112,7 +113,7 @@ class Example() {
 
 引入该功能的目的是为了简化基本类型与对象转换的写法
 
-<span style="font-family: 'JetBrains Mono'">
+<span style="font-family: 'Fira Code'">
 
 | 基本类型（内容） | 对象（指针、内存） |
 | :---: | :---: |
@@ -288,7 +289,7 @@ public interface NewAnmail {
 
 `🚩注意`
 
-<span style="font-family: 'JetBrains Mono'">
+<span style="font-family: 'Fira Code'">
     对于接口的默认方法：<br>
     1. 默认方法以<font color="#db7093">default</font>作为关键字的标注<br>
     2. 默认方法不允许重写Object中的方法，如equals、toString等<br>
@@ -465,5 +466,78 @@ class Example {
 `🚩注意`
 
 <div style="font-family: 'Fira Code'">
-1. var可以用在局部变量上，而非类成员变量
+1. var可以用在局部变量上，而非类成员变量<br>
+2. var可以用在for/for-each上<br>
+3. var在声明时必须进行初始化<br>
+4. var不可以使用在返回值以及方法的参数部分<br>
+5. var不适合大面积的使用<br>
+6. var的处理只在编译时进行，JVM不会对其进行单独的处理<br>
 </div>
+
+## <a id="switch"><font face="Fira Code">switch</font></a>
+
+`switch支持的类型`
+
+<span style="font-family: 'Fira Code'">
+
+| 支持类型 | 不支持类型 |
+|:---:|:---:|
+| byte/Byte | long
+| short/Short | float
+| int/Integer | double
+| char/Character |
+| String |
+| Enum |
+
+</span>
+
+`使用`
+
+```java
+class Example() {
+	public static void main(String[] args) {
+        Integer s = 10;
+        switch (s) {
+            case 1:
+	            System.out.println("s = 1");
+            case 10:
+	            System.out.println("s = 10");
+            case 100:
+	            System.out.println("s = 100");
+            default:
+	            System.out.println("s = 0");
+        }
+	}
+}
+```
+
+### <font face="Fira Code">switch的多分支合并 - <font color="red">JDK12</font></font>
+`例子`
+
+```java
+class Example() {
+	public static void main(String[] args) {
+        int month;
+        int day;
+        
+        // 方式一
+        switch (month) {
+        	case 1, 3, 5, 7, 8, 10, 12 -> day = 31;
+        	case 4, 6, 9, 11 -> day = 30;
+        	case 2 -> day = 28;
+            default -> day = 0;
+        }
+        
+        // 方式二
+        int the_day = switch (month) {
+	        case 1, 3, 5, 7, 8, 10, 12 -> 31;
+	        case 4, 6, 9, 11 -> 30;
+	        default -> {
+	        	// 此处特殊
+	        	int Day = 28;
+	        	break Day;
+            }
+        };
+	}
+}
+```
