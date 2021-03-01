@@ -119,3 +119,83 @@ public class Example implements TInterface {
 
 > <font face="Fira Code">注意，T也可以本身就是一个泛型，所以在最终调用的时候，也许会出现&lt;T&lt;E&gt;&gt;这样的形式</font>
 
+## 泛型类型限定
+
+`对泛型的类型进行限制`
+
+> <font face="Fira Code">在特定的场合下，一个泛型需要被限制，比如在进行比较时，需要实现compareTo，因此就需要限定泛型的类型：</font>
+
+```java
+class Example {
+    public static <T extends Comparable> T getMin(T... args) {
+        if (args == null || args.length <= 0) return null;
+        
+        T min = args[0];
+        
+        for (var i : args) {
+            if (min.compareTo(args[i]) > 0) min = args[i];
+        }
+        
+        return min;
+    } 
+}
+```
+
+> <font face="Fira Code">
+>   &lt;T extends E&gt;表示T必须是E的子类<br>
+>   当然，限定的时候可以让T extends多个接口，使用如下的方式：<br>
+>   <font color="#db7093">extends可以限定多个接口，但是只能限定一个类，而且类必须放在第一位</font><br>
+> </font>
+
+```java
+import java.io.File;
+
+// 统一使用extends而不使用implement
+class Example {
+    public static <T extends File & Cloneable & Comparable> doSomething() {
+        // pass
+    }
+}
+```
+
+## 泛型继承原则
+
+<span style="font-family: 'Fira Code'">
+    Example&lt;T&gt;和Example&lt;S&gt;之间不存在任何联系，无论S与T之间有什么关系<br>
+    但是，泛型类是可以扩展或者实现其他类的，比如ArrayList&lt;T&gt;实现List&lt;T&gt;，因为两者的泛型类型相同<br><br>
+    <font color="red">也就是说，如果泛型类型不同，则两者（泛型类）之间是不存在关系的</font>
+</span>
+
+为了弥补泛型关系之间的不足，推出了**泛型通配符类型**
+
+---
+### 泛型通配符类型
+
+`上限界定符`
+
+<span style="font-family: 'Fira Code'">
+    <font color="#db7093">OneClass&lt;? extends S&gt;<br></font> 
+    表示OneClass所能接受的泛型类型必须是S本身或者是S的子类。不过要注意的是，在此只能使用get方法，而不能使用set方法，是因为get一定可以保证获取到的数据一定可以转为S，但是set方法就充满了不确定性，所以在此处只能使用get方法获取对象
+</span>
+
+`下限界定符`
+
+<span style="font-family: 'Fira Code'">
+    <font color="#db7093">OneClass&lt;? super S&gt;<br></font>
+    表示OneClass所可以接受的泛型类型必须是S本身或者S的超类。同样要注意的是，在下限界定符中，可以使用set而不可以使用get方法，理由和上限界定符类似（相反）
+</span>
+
+↓
+
+综述上面的两种界定符，我们可以得出一个原则：`泛型PECS原则`
+
+> <font face="Fira Code"><strong>PECS原则：</strong><br>
+>   Producer Extends, Consumer Super<br>
+> 为了获取信息而不写入信息，使用 ?extends，泛型为生产者 - 输出信息<br>
+> 为了写入信息而不获取信息，使用 ?super，泛型为消费者 - 写入信息<br>
+> </font> 
+
+**如果既想写入又想写出，不要使用通配符！**
+
+> <font face="Fira Code">无限定通配符：Pair&lt;?&gt;，表示任意类型，也因此无法set，get也只能get出Object类的</font>
+
