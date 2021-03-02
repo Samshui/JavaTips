@@ -107,7 +107,7 @@ public class Example implements Serializable {
 
 **注意：序列化会引起安全漏洞，将会被移除，谨慎使用！**
 
-### 反射
+### <a id="invoke">反射</a>
 
 ```java
 import java.lang.reflect.Constructor;
@@ -137,3 +137,211 @@ public class A {
 }
 ```
 
+## 反射关键类
+
+> <font face="Fira Code">关键类Class：类型标识<br>
+> JVM为每个对象都保留了其类型标识信息RTI（Running Type Identification）
+> </font>
+
+```java
+// 获取标识信息的方法
+public class Example {
+    public static void main(String[] args) {
+        String s = "abc";
+    
+        Class c1 = s.getClass();
+        Class c2 = Class.forName("java.lang.String");
+        Class c3 = String.class;
+    }
+}
+```
+
+> <font face="Fira Code">关键类Class的一些方法<br>
+> 1- getMethods() / getDeclaredMethods()<br>
+> 2- getFields() / getDeclaredFields()<br>
+> 3- getInterface()<br>
+> 4- getPackage()<br>
+> 5- getConstructors()<br>
+> 6- getModifiers()<br>
+> 7- getSuperClass()<br>
+> 8- getAnnotation()
+> </font>
+
+### 成员变量
+`Field`
+
+```java
+import java.lang.reflect.Field;
+
+public class A {
+    public int age;
+    private String name;
+    
+    public A(int age, String name) {
+        this.age = age;
+        this.name = name;
+    }
+    
+    public static void main(String[] args) throws IllegalAccessException {
+        A a = new A(20, "Man");
+        Class c = a.getClass();
+    
+        // getFields 只负责获得本类与父类所有可获得的（public）字段
+        Field[] fields = c.getFields();
+        System.out.println(fields.length); // 1
+        System.out.println(fields[0].getName() + " : " + fields[0].get(a));
+    
+        // getDeclaredFields 负责获取本类所有的字段
+        // private属性会临时变为public
+        Field[] allFileds = c.getDeclaredFields();
+        System.out.println(allFileds.length);
+        for (var i : allFileds) {
+            System.out.println(i.getName() + " : " + i.get(a));
+        }
+    }
+}
+```
+
+### 成员方法
+`Method`
+
+[查看“反射”处的代码](#invoke)，其中的<font face="Fira Code">m.invoke(obj, null)就是方法的调用</font>
+
+### 构造函数
+`Constructor`
+
+```java
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+
+public class A {
+    private int num;
+    
+    public A() {
+    }
+    
+    public A(int num) {
+        this.num = num;
+    }
+    
+    public void method() {
+        System.out.println(num);
+    }
+    
+    public static void main(String[] args) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+        A a = new A();
+        Class c = a.getClass();
+    
+        Constructor[] cs = c.getConstructors();
+        for (var i : cs) {
+            if (i.getParameterCount() > 0) {
+                // 有参构造函数
+                A a1 = (A) i.newInstance(20);
+                a1.method();
+            } else {
+                A a2 = (A) i.newInstance();
+                a2.method();
+            }
+        }
+    }
+}
+```
+
+### 父类/父接口
+`Super`
+
+## 反射的应用
+
+- <font face="Fira Code">JDBC 数据库连接</font>
+- 数组扩充
+- 动态执行方法
+- <font face="Fira Code">Json和Java对象的互转</font>
+
+### 数组扩充
+`非原地扩充`
+
+> <font face="Fira Code">在Java中，如果给定了一个数组，则数组的长度就是确定的，不可以再进行修改<br><br>
+> 如果需要扩充数组的话，必须编写扩充器，也即：新建一个更大的同类型数组，并把旧数组的内容拷贝进去
+> </font>
+
+```java
+import java.lang.reflect.Array;
+
+public class Example {
+    // 扩充器
+    public static Object arrayLarger(Object oldArray, int newLength) {
+        // get old array's type
+        Class c = oldArray.getClass();
+    
+        // get item's type
+        Class ic = c.getComponentType();
+    
+        // get old array's len
+        int oldLength = Array.getLength(oldArray);
+        
+        // new Array
+        Object newArray = Array.newInstance(ic, newLength);
+        
+        // copy datas
+        System.arraycopy(oldArray, 0, newArray, 0, oldLength);
+        
+        // return new Array
+        return newArray;
+    }
+    
+    public static void main(String[] args) {
+        int[] a = {1,2,3,4,5};
+        a = (int[]) arrayLarger(a, 10);
+        
+        for (var i : a) System.out.println(i);
+    }
+}
+```
+
+### 动态执行方法
+
+> 动态执行方法：给定类名、方法名就可以执行，同时也可以加上定时器，完成定时的任务执行
+
+```java
+import java.lang.reflect.Method;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
+
+class Worker {
+    public static void hello() {
+        System.out.println("hello");
+    }
+}
+
+public class MyTask extends TimerTask {
+    @Override
+    public void run() {
+        try {
+            // 反射调用Worker类中的hello方法
+            Method m = Class.forName("Worker").getClass().getMethod("hello");
+            // 静态方法不需要new对象，直接反射到类名就可以直接运行
+            m.invoke(null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public static void main(String[] args) {
+        Timer timer = new Timer();
+    
+        Calendar now = Calendar.getInstance();
+        now.set(Calendar.SECOND, now.get(Calendar.SECOND) + 1);
+    
+        Date runDate = now.getTime();
+        MyTask myTask = new MyTask();
+    
+        timer.scheduleAtFixedRate(myTask, runDate, 3000);
+    }
+}
+```
+
+### Json和Java对象的互转
+`使用Google的库`
